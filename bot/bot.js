@@ -9,7 +9,7 @@ let controller = Botkit.slackbot({
 
 // connect the bot to a stream of messages
 controller.spawn({
-  token: 'xoxb-299674182759-2T8WnicDBOKb8MVoXfTuNTJB',
+  token: 'xoxb-299674182759-hjq3N9KuiganlBTVWHr8Jhhn',
 }).startRTM();
 
 
@@ -20,7 +20,7 @@ controller.hears('hello',['direct_message','direct_mention','mention'],function(
 
 
 
-controller.hears('thanks','direct_message,direct_mention  ,ambient', function(bot, message) {
+controller.hears(['thanks'],'direct_message,direct_mention  ,ambient', function(bot, message) {
     let coming =  message
     let sender =  coming.raw_message.user
     let resiver = coming.raw_message.text.match(/\@(.*)\>/)[1]
@@ -28,7 +28,7 @@ controller.hears('thanks','direct_message,direct_mention  ,ambient', function(bo
       axios.get("http://localhost:3000/karma?userid="+sender)
       .then((_response)=>{
         console.log(_response.data)
-          if(_response.data.sharepoint > 0){
+          if(_response.data.sharepoint > 0 || _response.data == ""){
             axios.post('http://localhost:3000/send',{
                 sender : sender,
                 reciver : resiver
@@ -81,7 +81,12 @@ controller.hears(["^leaderboard$"],'direct_message,direct_mention',(bot,message)
   controller.hears(["^karma$"],'direct_message,direct_mention ',(bot,message)=>{
     axios.get("http://localhost:3000/karma?userid="+message.raw_message.user)
     .then(function (response){
-      bot.reply(message,"you have "+response.data.mypoint+" karma point , and can give "+response.data.sharepoint+" karmas today")
+      if(response.data != ""){
+        bot.reply(message,"you have "+response.data.mypoint+" karma point , and can give "+response.data.sharepoint+" karmas today")
+      }
+      else{
+        bot.reply(message,"you have  0 karma point , and can give 5 karmas today")
+      }
     })
     
   })
